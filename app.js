@@ -18,10 +18,10 @@ mongoose.connection.on("connected",function(){
 	console.log("数据库连接成功")
 })
 mongoose.connection.on("disconnected",function(){
-	console.log("数据库断开连接")
+  console.log("数据库断开连接")
 })
 mongoose.connection.on("error",function(){
-	console.log("数据库连接失败")
+  console.log("数据库连接失败")
 })
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
