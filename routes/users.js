@@ -51,7 +51,7 @@ router.post('/addUser', function(req, res, next) {//新建用户
 			var userInsert = new User(user);
 			userInsert.save(function(err1, doc){
 			    if(err1){
-			        res.json({
+			        return res.json({
 			            status: '0',
 			            msg: err1.message,
 			            result: ''
@@ -62,7 +62,7 @@ router.post('/addUser', function(req, res, next) {//新建用户
 			                path: '/',
 			                maxAge: 1000*60*60*24*365
 			            })
-			            res.json({
+			            return res.json({
 			                status: '1',
 			                msg: '',
 			                result: userId
@@ -80,20 +80,20 @@ router.post('/getUserInfo', function(req, res, next) {//获取用户
     	userId: userId
     },function(err,userDoc){
         if(err){
-            res.json({
+            return res.json({
                 status: '0',
                 msg: err.message,
                 result: ''
             })
         }else{
             if(userDoc){
-                res.json({
+                return res.json({
                     status: '1',
                     msg: '',
                     result: userDoc
                 })
             }else{
-            	res.json({
+            	return res.json({
 	                status: '1',
 	                msg: '未找到用户',
 	                result: ''
@@ -110,7 +110,7 @@ router.post('/periodStart', function(req, res, next) {
       userId: userId
     },function(err,user){
       	if(err){
-	        res.json({
+	        return res.json({
 	          status: '0',
 	          msg: err.message,
 	          result: ''
@@ -127,13 +127,13 @@ router.post('/periodStart', function(req, res, next) {
 		      	user.periodEndLately = dateCount.dateAfter(user.periodStartLately,4);
 		      	user.save(function(err1,saveDoc){
 					if(err1){
-			  			res.json({
+			  			return res.json({
 			  				status: '0',
-								msg: err1.message,
-								result: ''
+							msg: err1.message,
+							result: ''
 			  			})
 			  		}else{
-			  			res.json({
+			  			return res.json({
 			  				status: '1',
 							msg: '',
 							result: 'success'
@@ -141,7 +141,7 @@ router.post('/periodStart', function(req, res, next) {
 			  		}
 			  	})
 	      	}else{
-	        	res.json({
+	        	return res.json({
 	                status: '1',
 	                msg: '未找到用户',
 	                result: ''
@@ -158,7 +158,7 @@ router.post('/periodEnd', function(req, res, next) {
       userId: userId
     },function(err,userDoc){
       	if(err){
-	        res.json({
+	        return res.json({
 	          status: '0',
 	          msg: err.message,
 	          result: ''
@@ -179,13 +179,13 @@ router.post('/periodEnd', function(req, res, next) {
 	            })
 	            userDoc.save(function(err1,saveDoc){
 	  				if(err1){
-			  			res.json({
+			  			return res.json({
 			  				status: '0',
 	  						msg: err1.message,
 	  						result: ''
 			  			})
 			  		}else{
-			  			res.json({
+			  			return res.json({
 			  				status: '1',
 	  						msg: '',
 	  						result: 'success'
@@ -193,7 +193,7 @@ router.post('/periodEnd', function(req, res, next) {
 			  		}
 	  			})
 	        }else{
-	        	res.json({
+	        	return res.json({
 	                status: '1',
 	                msg: '未找到用户',
 	                result: ''
@@ -212,13 +212,13 @@ router.post('/editPeriodCycle', function(req, res, next) {
       periodCycle: req.body.periodCycle
     },function(err,user){
       if(err){
-        res.json({
+        return res.json({
           status: '0',
           msg: err.message,
           result: ''
         })
       }else{
-        res.json({
+        return res.json({
           status: '1',
           msg: '',
           result: 'success'
@@ -236,7 +236,7 @@ router.post('/addHistory', function(req, res, next) {
       userId: userId
     },function(err,userDoc){
       	if(err){
-	        res.json({
+	        return res.json({
 	          status: '0',
 	          msg: err.message,
 	          result: ''
@@ -260,13 +260,13 @@ router.post('/addHistory', function(req, res, next) {
 		      	}
 	            userDoc.save(function(err1,saveDoc){
 	  				if(err1){
-			  			res.json({
+			  			return res.json({
 			  				status: '0',
 	  						msg: err1.message,
 	  						result: ''
 			  			})
 			  		}else{
-			  			res.json({
+			  			return res.json({
 			  				status: '1',
 	  						msg: '',
 	  						result: 'success'
@@ -274,7 +274,7 @@ router.post('/addHistory', function(req, res, next) {
 			  		}
 	  			})
 	        }else{
-	        	res.json({
+	        	return res.json({
 	                status: '1',
 	                msg: '未找到用户',
 	                result: ''
@@ -293,7 +293,7 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
       "userId": userId,
     },function(err,userDoc){
       	if(err){
-	        res.json({
+	        return res.json({
 	          status: '0',
 	          msg: err.message,
 	          result: ''
@@ -311,13 +311,13 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
 		      	userDoc.periodEndLately = dateCount.compareDate(end,userDoc.periodEndLately)?userDoc.periodEndLately:end;
 	            userDoc.save(function(err1,saveDoc){
 	  				if(err1){
-			  			res.json({
+			  			return res.json({
 			  				status: '0',
 	  						msg: err1.message,
 	  						result: ''
 			  			})
 			  		}else{
-			  			res.json({
+			  			return res.json({
 			  				status: '1',
 	  						msg: '',
 	  						result: 'success'
@@ -325,7 +325,7 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
 			  		}
 	  			})
 	        }else{
-	        	res.json({
+	        	return res.json({
 	                status: '1',
 	                msg: '未找到用户',
 	                result: ''
@@ -335,13 +335,13 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
     })
 })
 router.post('/deleteHistory', function(req, res, next) { //删除历史记录
-	let userId = req.cookies.userId;
+	let userId = req.body.userId;
     let historyId = req.body.historyId;
     User.findOne({
       userId: userId,
     },function(err,userDoc){
     	if(err){
-	        res.json({
+	        return res.json({
 	          	status: '0',
 	          	msg: err.message,
 	          	result: ''
@@ -350,30 +350,30 @@ router.post('/deleteHistory', function(req, res, next) { //删除历史记录
      		if(userDoc){
      			userDoc.history.forEach(function(item){
      				if(item._id == historyId){
-     					userDoc.history.splice(item,1);
+     					userDoc.history.splice(userDoc.history.indexOf(item),1);
      				}
 			    	if(userDoc.history.length == 0){
 			    		userDoc.periodStartLately = userDoc.status == 1? userDoc.periodStart:'';
 			    		userDoc.periodEndLately = userDoc.periodStartLately != '' ? dateCount.dateAfter(userDoc.periodStartLately,4): '';
 			    	}
-			    	userDoc.save(function(err1,user){
-				      	if(err){
-					        res.json({
-					          	status: '0',
-					          	msg: err.message,
-					          	result: ''
-					        })
-				     	}else{
-					        res.json({
-					          	status: '1',
-					          	msg: '',
-					          	result: 'success'
-					        })
-				      	}
-			    	})
      			})
+		    	userDoc.save(function(err1,user){
+			      	if(err1){
+				        return res.json({
+				          	status: '0',
+				          	msg: err1.message,
+				          	result: ''
+				        })
+			     	}else{
+				        return res.json({
+				          	status: '1',
+				          	msg: '',
+				          	result: 'success'
+				        })
+			      	}
+		    	})
      		}else{
-     			res.json({
+     			return res.json({
 		          	status: '0',
 		          	msg: '没有找到用户',
 		          	result: ''
