@@ -48,27 +48,67 @@ router.post('/addUser', function(req, res, next) {//新建用户
 				"periodEndLately": '',
 				"history": []
 			}
-			var userInsert = new User(user);
-			userInsert.save(function(err1, doc){
-			    if(err1){
-			        return res.json({
-			            status: '0',
-			            msg: err1.message,
-			            result: ''
-			        })
-			    }else{
-			        if(doc){
-			            res.cookie('userId', userId,{
-			                path: '/',
-			                maxAge: 1000*60*60*24*365
-			            })
-			            return res.json({
-			                status: '1',
-			                msg: '',
-			                result: userId
-			            })
-			        }
-			    }
+			User.findOne({
+				openid: openid
+			},function(err,userDoc){
+				if(err){
+		            return res.json({
+		                status: '0',
+		                msg: err.message,
+		                result: ''
+		            })
+		        }else{
+		            if(userDoc){
+						User.findOne({
+					    	openid: openid
+					    },function(err,userDoc){
+					        if(err){
+					            return res.json({
+					                status: '0',
+					                msg: err.message,
+					                result: ''
+					            })
+					        }else{
+					            if(userDoc){
+					                return res.json({
+					                    status: '1',
+					                    msg: '',
+					                    result: userDoc.userId
+					                })
+					            }else{
+					            	return res.json({
+						                status: '0',
+						                msg: '未找到用户',
+						                result: ''
+						            })
+					            }
+					        }
+					    })
+		            }else{
+						var userInsert = new User(user);
+						userInsert.save(function(err1, doc){
+						    if(err1){
+						        return res.json({
+						            status: '0',
+						            msg: err1.message,
+						            result: ''
+						        })
+						    }else{
+						        if(doc){
+						            res.cookie('userId', userId,{
+						                path: '/',
+						                maxAge: 1000*60*60*24*365
+						            })
+						            return res.json({
+						                status: '1',
+						                msg: '',
+						                result: userId
+						            })
+						        }
+						    }
+						})
+		            }
+		        }
 			})
         });
     });
@@ -94,7 +134,7 @@ router.post('/getUserInfo', function(req, res, next) {//获取用户
                 })
             }else{
             	return res.json({
-	                status: '1',
+	                status: '0',
 	                msg: '未找到用户',
 	                result: ''
 	            })
@@ -124,7 +164,6 @@ router.post('/periodStart', function(req, res, next) {
 		      	}else{
 		      		user.periodStartLately = dateCount.compareDate(req.body.periodStart,user.periodStartLately)?user.periodStartLately:req.body.periodStart;
 		      	}
-		      	user.periodEndLately = dateCount.dateAfter(user.periodStartLately,4);
 		      	user.save(function(err1,saveDoc){
 					if(err1){
 			  			return res.json({
@@ -142,7 +181,7 @@ router.post('/periodStart', function(req, res, next) {
 			  	})
 	      	}else{
 	        	return res.json({
-	                status: '1',
+	                status: '0',
 	                msg: '未找到用户',
 	                result: ''
 	            })
@@ -194,7 +233,7 @@ router.post('/periodEnd', function(req, res, next) {
 	  			})
 	        }else{
 	        	return res.json({
-	                status: '1',
+	                status: '0',
 	                msg: '未找到用户',
 	                result: ''
 	            })
@@ -246,15 +285,15 @@ router.post('/addHistory', function(req, res, next) {
 	            userDoc.history.push({
 	            	start: start,
 					end: end,
-					days: dateCount.dateDiff(start,end)+1
+					days: dateCount.dateDiff(start,end)
 	            })
 	            if(userDoc.periodStartLately == ''){
-		      		userDoc.periodStartLately = req.body.start;
+	            	userDoc.periodStartLately = dateCount.compareDate(req.body.start,userDoc.periodStart)?userDoc.periodStart:req.body.start
 		      	}else{
 		      		userDoc.periodStartLately = dateCount.compareDate(req.body.start,userDoc.periodStartLately)?userDoc.periodStartLately:req.body.start;
 		      	}
 		      	if(userDoc.periodEndLately == ''){
-		      		userDoc.periodEndLately = req.body.end;
+		      		userDoc.periodEndLately = dateCount.compareDate(req.body.end,userDoc.periodEnd)?userDoc.periodEnd : req.body.end;
 		      	}else{
 		      		userDoc.periodEndLately = dateCount.compareDate(req.body.end,userDoc.periodEndLately)?userDoc.periodEndLately:req.body.end;
 		      	}
@@ -275,7 +314,7 @@ router.post('/addHistory', function(req, res, next) {
 	  			})
 	        }else{
 	        	return res.json({
-	                status: '1',
+	                status: '0',
 	                msg: '未找到用户',
 	                result: ''
 	            })
@@ -304,7 +343,7 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
 	            	if(item._id == historyId){
 	            		item.start = start,
 						item.end = end,
-						item.days = dateCount.dateDiff(start,end)+1
+						item.days = dateCount.dateDiff(start,end)
 	            	}
 	            })
 		      	userDoc.periodStartLately = dateCount.compareDate(start,userDoc.periodStartLately)?userDoc.periodStartLately:start;
@@ -326,7 +365,7 @@ router.post('/updateHistory', function(req, res, next) { //更新历史记录
 	  			})
 	        }else{
 	        	return res.json({
-	                status: '1',
+	                status: '0',
 	                msg: '未找到用户',
 	                result: ''
 	            })
@@ -353,8 +392,15 @@ router.post('/deleteHistory', function(req, res, next) { //删除历史记录
      					userDoc.history.splice(userDoc.history.indexOf(item),1);
      				}
 			    	if(userDoc.history.length == 0){
-			    		userDoc.periodStartLately = userDoc.status == 1? userDoc.periodStart:'';
-			    		userDoc.periodEndLately = userDoc.periodStartLately != '' ? dateCount.dateAfter(userDoc.periodStartLately,4): '';
+			    		if(userDoc.status == 0){
+			    			userDoc.periodStartLately = '';
+			    			userDoc.periodEndLately = '';
+			    			userDoc.periodStart = '';
+			    			userDoc.periodEnd = '';
+			    		}else{
+				    		userDoc.periodStartLately = userDoc.periodStart;
+				    		userDoc.periodEndLately = userDoc.periodEnd;
+			    		}
 			    	}
      			})
 		    	userDoc.save(function(err1,user){

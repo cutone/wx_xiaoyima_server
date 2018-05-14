@@ -27,6 +27,11 @@ function dateAfter(date,days){
 }
 
 function compareDate(t1, t2){
+    if(!t1){
+      return true;
+    }else if(!t2){
+      return false;
+    }
     var strs1= new Array(); //定义一数组
     strs1=t1.split("-"); //字符分割
     var strs2= new Array(); //定义一数组
